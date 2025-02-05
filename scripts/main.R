@@ -1,25 +1,24 @@
 ##### Importing the packages #####
 
-# Importation Excel files
+# Importation de fichiers excel
 library(openxlsx)
 library(readxl)
 
-# Dezscriptive statistics
-library(gtsummary)
+library(gtsummary) # Tableaux descriptifs des données
 
-# Association set mining
+# Association rule mining
 library(arules)
 library(arulesViz)
 
-# Parallel computing
+# Calcul en parallèle
 library(parallel)
 library(foreach)
 library(doParallel)
 
-# Network graphs
+# Graphes réseaux
 library(igraph)
 
-# Graphs
+# Graphiques
 library(grid)
 library(gridExtra)
 library(cowplot)
@@ -27,35 +26,34 @@ library(png)
 library(Cairo)
 library(ggpubr)
 
+library(trend) # mann-kendall test
 
-
-# Additional colors
+# Couleurs
 library(randomcoloR)
 library(RColorBrewer)
-library(berryFunctions)
+library(berryFunctions) # pour faire les couleurs faded du graphe nb resist obs simul
 
-# Maps
+# Cartes du nombre d'isolats par région
 library(sp)
 library(sf)
 
-# Statistical tests
-library(trend)
-
-# Miscellaneous
+# Divers
 library(tidyverse)
 library(stringr)
 library(reshape2)
 library(plyr)
 library(splitstackshape)
 
-##### Loading functions #####
+##### Chargement des fonctions utiles #####
 source("scripts/functions.R")
 
 
 
 ##### Loading data #####
 
-AM_class_dataframe <- read_excel("data/AM_class_for_network_plot.xlsx") %>% # dataframe with informations about antimicrobial classes
+# Charging the dataframe with informations about antimicrobial classes
+
+AM_class_dataframe <- read_excel("data/AM_class_for_network_plot.xlsx") %>%
   mutate(
     AM = as.factor(AM),
     Code = as.factor(Code),
@@ -64,7 +62,11 @@ AM_class_dataframe <- read_excel("data/AM_class_for_network_plot.xlsx") %>% # da
 
 antibiotic_names = as.character(AM_class_dataframe$AM) # vector containing all names of antimicrobials
 
-load("data/colors.RData") # colors for plotting networks of resistance associations
+load("data/colors.RData") # Charging colors for plotting networks of resistance associations
+
+
+
+##### Defining parameters #####
 
 regions = c("Auvergne_Rhone_Alpes", # defining regions we include in the study. Here, all metropolitan France
             "Bourgogne_Franche_Comte",
@@ -79,8 +81,8 @@ regions = c("Auvergne_Rhone_Alpes", # defining regions we include in the study. 
             "Pays_de_la_Loire",
             "Provence_Alpes_Cote_d_Azur")
 
-# Parameters for dataset simulation (under the hypothesis of mutual independence H0)
-n = 100 # number of datasets to be simulated 
+# Parameters for 3_simul_datasets_H0
+n = 100 # number of datasets to be simulated under H0
 
 # Parameters for apriori
 minsup_BLSE = 0.01 # minimum support for ESBL isolates
@@ -90,10 +92,11 @@ minsup_non_BLSE = 0.001 # minimum support for non-ESBL isolates
 pvalue = "0.95"
 
 
+
 ##### Importing data #####
 
-### Option 1: data formatting based on raw data
+### Option 1 : on met en forme les données à partir des données brutes
 # source("scripts/1_data_prep.R")
 
-### Option 2 : direct loading of data
+### Option 2 : on load directement les données
 load("data/clean_data.RData")
