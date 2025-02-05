@@ -35,11 +35,11 @@ F.analyses_by_gender : performing the analyses stratified by gender
 
 Contains the results of the analyses conducted on the whole datasets from 2018 to 2022
 
-# Results_bs_2018
+### Results_bs_2018
 
 Contains the results of the bootstrapped datasets of 2018
 
-# Results_by_age_class
+### Results_by_age_class
 
 Contains the results of the analyses stratified by age class :
 
@@ -47,7 +47,7 @@ Contains the results of the analyses stratified by age class :
 - results for individuals over 65 from 2018 to 2022
 - results bootstrapped for under 65
 
-# Results_by gender
+### Results_by gender
 
 Contains the results of the analyses stratified by gender:
 
@@ -56,11 +56,11 @@ Contains the results of the analyses stratified by gender:
 - results_women : results for all the women from 2018 to 2022
 - results_sampled_women_size_men:results for the women datasets sampled at the size of the men dataset from 2018 to 2022
 
-# Results_samples_2018_size
+### Results_samples_2018_size
 
 Contains the results of the analyses from 2019 to 2022, sampled at the size of 2018
 
-# Results_samples_regio_prop
+### Results_samples_regio_prop
 
 Contains the results of the analyses from 2019 to 2022, with a number of isolates proportional to the regional populations
 
