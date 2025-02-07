@@ -96,11 +96,12 @@ for (i in 1:length(list_datasets)){
          file = paste0(dossier_enreg,"reseaux/", nom_graph, ".RData"))
     
     # Saving a plot of the graph
-    png(paste0(dossier_enreg, "plots_reseaux/", nom_graph , ".png"), width = 22, height = 22, units = "cm", res = 1000)
-    plot(graph,
-         layout = layout_in_circle
-    )
-    dev.off()
+    ppt <- read_pptx() %>%
+      add_slide(layout = "Blank", master = "Office Theme") %>%
+      ph_with(dml(code = plot(graph,
+                              layout = layout_in_circle
+      )), location = ph_location_fullsize())
+    print(ppt, target = paste0(dossier_enreg, "plots_reseaux/", nom_graph , ".pptx"))
   }
 }
 

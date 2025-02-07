@@ -54,12 +54,10 @@ list_data_simul <- c( #Simulated data is very voluminous. We cut the lists of da
   "2022_non_BLSE_91_100"
 )
 
-# a. Data description
-source("scripts/2_data_description.R")
 
 # b. Simulating databases under H0 : antimicrobial resistances are independent
 source("scripts/3_simulation_bdd.R")
-source("scripts/figure_2_plot_nb_resis_obs_simul.R")
+source("scripts/Figure2.R")
 
 # c. Algorithme Apriori
 source("scripts/4_apriori.R")

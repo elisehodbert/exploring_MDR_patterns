@@ -1,4 +1,19 @@
-##### Define Colors for Figure 1 #####
+dossier_enreg = "results_all_data/"
+chemin_donnees = "data/"
+
+list_datasets = c(
+  "2018_BLSE",
+  "2019_BLSE",
+  "2020_BLSE",
+  "2021_BLSE",
+  "2022_BLSE",
+  "2018_non_BLSE",
+  "2019_non_BLSE",
+  "2020_non_BLSE",
+  "2021_non_BLSE",
+  "2022_non_BLSE"
+)
+
 
 # Assign colors to each antibiotic class for the bar plots
 color_vector <- c(rep(colors[1], 3),
@@ -65,6 +80,26 @@ sapply(list_datasets, function(dataset) {
          plot = figure, width = 29.7, height = 10, units = "cm")
 })
 
+fig1 = ggarrange(plot_resistance_with_error_bars("EC_2022_BLSE"), 
+          plot_resistance_with_error_bars("EC_2022_non_BLSE"),
+          labels = c("A", "B"),
+          ncol = 1, nrow = 2)
+
+pdf("fig1.pdf", width = 29.7/2.54, height = 21/2.54)
+fig1
+dev.off()
+
+library(officer)
+library(rvg)
+
+# Créer un PPT au format A4 paysage
+ppt <- read_pptx() %>%
+  add_slide(layout = "Blank", master = "Office Theme") %>%
+  ph_with(dml(code = print(fig1)), location = ph_location_fullsize())
+
+# Sauvegarde du fichier
+print(ppt, target = "fig1.pptx")
+
 
 # Create and save combined plots for ESBL and non-ESBL results for each year
 sapply(as.character(2018:2022), function(year) {
@@ -109,53 +144,53 @@ write.xlsx(create_resistance_table(EC_2022_non_BLSE),
            file = "plots/antibioresist_prev/prev_resist_2022_non_BLSE.xlsx")
 
 ##### Creating a Summary Table with Gender and Age #####
-
-combined_data <- bind_rows(
-  mutate(EC_2018, dataset = "EC_2018"),
-  mutate(EC_2019, dataset = "EC_2019"),
-  mutate(EC_2020, dataset = "EC_2020"),
-  mutate(EC_2021, dataset = "EC_2021"),
-  mutate(EC_2022, dataset = "EC_2022")
-)
-
-summary_table <- combined_data %>%
-  tbl_summary(include = c("age", "sexe"), by = dataset)
-
-write.xlsx(summary_table$table_body, 
-           file = "results_all_data/summary_table_age_gender.xlsx")
-
-##### ESBL Proportion Over Time #####
-
-# Count the number of ESBL and non-ESBL cases each year
-esbl_counts <- c(nrow(EC_2018_BLSE), nrow(EC_2019_BLSE), 
-                 nrow(EC_2020_BLSE), nrow(EC_2021_BLSE), nrow(EC_2022_BLSE))
-
-non_esbl_counts <- c(nrow(EC_2018_non_BLSE), nrow(EC_2019_non_BLSE), 
-                     nrow(EC_2020_non_BLSE), nrow(EC_2021_non_BLSE), nrow(EC_2022_non_BLSE))
-
-esbl_vs_non_esbl <- matrix(c(esbl_counts, non_esbl_counts), nrow = 2, byrow = TRUE)
-colnames(esbl_vs_non_esbl) <- c("EC_2018", "EC_2019", "EC_2020", "EC_2021", "EC_2022")
-rownames(esbl_vs_non_esbl) <- c("ESBL", "Non_ESBL")
-
-# Mann-Kendall test for ESBL proportion over time
-esbl_proportion <- esbl_counts / (esbl_counts + non_esbl_counts)
-mk.test(esbl_proportion)
-
-##### Gender Proportion Over Time #####
-
-# Count the number of females and males each year
-female_counts <- sapply(list(EC_2018, EC_2019, EC_2020, EC_2021, EC_2022), function(data) {
-  nrow(filter(data, sexe == "F"))
-})
-
-male_counts <- sapply(list(EC_2018, EC_2019, EC_2020, EC_2021, EC_2022), function(data) {
-  nrow(filter(data, sexe == "H"))
-})
-
-gender_proportion <- matrix(c(female_counts, male_counts), nrow = 2, byrow = TRUE)
-colnames(gender_proportion) <- c("EC_2018", "EC_2019", "EC_2020", "EC_2021", "EC_2022")
-rownames(gender_proportion) <- c("Female", "Male")
-
-# Mann-Kendall test for gender proportion over time
-female_proportion <- female_counts / (female_counts + male_counts)
-mk.test(female_proportion)
+# 
+# combined_data <- bind_rows(
+#   mutate(EC_2018, dataset = "EC_2018"),
+#   mutate(EC_2019, dataset = "EC_2019"),
+#   mutate(EC_2020, dataset = "EC_2020"),
+#   mutate(EC_2021, dataset = "EC_2021"),
+#   mutate(EC_2022, dataset = "EC_2022")
+# )
+# 
+# summary_table <- combined_data %>%
+#   tbl_summary(include = c("age", "sexe"), by = dataset)
+# 
+# write.xlsx(summary_table$table_body, 
+#            file = "results_all_data/summary_table_age_gender.xlsx")
+# 
+# ##### ESBL Proportion Over Time #####
+# 
+# # Count the number of ESBL and non-ESBL cases each year
+# esbl_counts <- c(nrow(EC_2018_BLSE), nrow(EC_2019_BLSE), 
+#                  nrow(EC_2020_BLSE), nrow(EC_2021_BLSE), nrow(EC_2022_BLSE))
+# 
+# non_esbl_counts <- c(nrow(EC_2018_non_BLSE), nrow(EC_2019_non_BLSE), 
+#                      nrow(EC_2020_non_BLSE), nrow(EC_2021_non_BLSE), nrow(EC_2022_non_BLSE))
+# 
+# esbl_vs_non_esbl <- matrix(c(esbl_counts, non_esbl_counts), nrow = 2, byrow = TRUE)
+# colnames(esbl_vs_non_esbl) <- c("EC_2018", "EC_2019", "EC_2020", "EC_2021", "EC_2022")
+# rownames(esbl_vs_non_esbl) <- c("ESBL", "Non_ESBL")
+# 
+# # Mann-Kendall test for ESBL proportion over time
+# esbl_proportion <- esbl_counts / (esbl_counts + non_esbl_counts)
+# mk.test(esbl_proportion)
+# 
+# ##### Gender Proportion Over Time #####
+# 
+# # Count the number of females and males each year
+# female_counts <- sapply(list(EC_2018, EC_2019, EC_2020, EC_2021, EC_2022), function(data) {
+#   nrow(filter(data, sexe == "F"))
+# })
+# 
+# male_counts <- sapply(list(EC_2018, EC_2019, EC_2020, EC_2021, EC_2022), function(data) {
+#   nrow(filter(data, sexe == "H"))
+# })
+# 
+# gender_proportion <- matrix(c(female_counts, male_counts), nrow = 2, byrow = TRUE)
+# colnames(gender_proportion) <- c("EC_2018", "EC_2019", "EC_2020", "EC_2021", "EC_2022")
+# rownames(gender_proportion) <- c("Female", "Male")
+# 
+# # Mann-Kendall test for gender proportion over time
+# female_proportion <- female_counts / (female_counts + male_counts)
+# mk.test(female_proportion)
