@@ -143,6 +143,34 @@ write.xlsx(create_resistance_table(EC_2022_BLSE),
 write.xlsx(create_resistance_table(EC_2022_non_BLSE), 
            file = "plots/antibioresist_prev/prev_resist_2022_non_BLSE.xlsx")
 
+## Age description by gender
+median_percentiles_by_dataset_sex <- combined_data %>%
+  dplyr::group_by(dataset, sexe) %>%
+  dplyr::summarise(
+    median_age = median(age, na.rm = TRUE),
+    p2_5       = quantile(age, probs = 0.025, na.rm = TRUE),
+    p97_5      = quantile(age, probs = 0.975, na.rm = TRUE),
+    age_min    = min(age, na.rm = TRUE),
+    age_max    = max(age, na.rm = TRUE),
+    .groups    = "drop"   # dé‐grouper automatiquement après summarise
+  ) %>%
+  
+  dplyr::mutate(
+    age_range       = paste0(age_min, " – ", age_max),
+    median_2_5_97_5 = paste0(
+      median_age,
+      " (",
+      round(p2_5, 1),
+      " – ",
+      round(p97_5, 1),
+      ")"
+    )
+  ) %>%
+  
+  dplyr::select(dataset, sexe, median_2_5_97_5, age_range)
+median_percentiles_by_dataset_sex
+
+
 ##### Creating a Summary Table with Gender and Age #####
 # 
 # combined_data <- bind_rows(

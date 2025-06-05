@@ -44,6 +44,10 @@ library(reshape2)
 library(plyr)
 library(splitstackshape)
 
+#Powerpoint
+library(officer)
+library(rvg)
+
 ##### Chargement des fonctions utiles #####
 source("scripts/functions.R")
 
@@ -59,8 +63,11 @@ AM_class_dataframe <- read_excel("data/AM_class_for_network_plot.xlsx") %>%
     Code = as.factor(Code),
     Code_eng = as.factor(Code_eng)
   )
+AM_class_dataframe <- AM_class_dataframe %>%
+  filter(AM != "AMP")
 
 antibiotic_names = as.character(AM_class_dataframe$AM) # vector containing all names of antimicrobials
+antibiotic_names <- antibiotic_names[antibiotic_names != "AMP"] # when we don't wnat to include AMP
 
 load("data/colors.RData") # Charging colors for plotting networks of resistance associations
 
@@ -99,4 +106,5 @@ pvalue = "0.95"
 # source("scripts/1_data_prep.R")
 
 ### Option 2 : on load directement les données
-load("data/clean_data.RData")
+load("data/clean_data.RData") # sans AMP
+load("data/clean_data_with_AMP.RData") # avec AMP

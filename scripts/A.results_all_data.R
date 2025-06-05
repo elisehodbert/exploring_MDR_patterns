@@ -57,7 +57,9 @@ list_data_simul <- c( #Simulated data is very voluminous. We cut the lists of da
 
 # b. Simulating databases under H0 : antimicrobial resistances are independent
 source("scripts/3_simulation_bdd.R")
-source("scripts/Figure2.R")
+
+# Pour la figure 2 : il faut aussi faire les simulations sur les jeux de données complets (pas fait pour l'instant)
+#source("scripts/Figure2.R")
 
 # c. Algorithme Apriori
 source("scripts/4_apriori.R")

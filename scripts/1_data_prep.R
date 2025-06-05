@@ -160,15 +160,42 @@ average_testing_rate$Mean_Testing_Rate <- rowMeans(
   average_testing_rate[, grep("Mean_Testing_Rate", colnames(average_testing_rate))],
   na.rm = TRUE
 )
-
-# Create a table with Antibiotic names and their average testing rate
 final_summary <- average_testing_rate[, c("Antibiotic", "Mean_Testing_Rate")]
 write.csv(final_summary, file = "antibiotics_selection/final_summary.csv")
+
+# Create a table with testing rate of each antibiotic for each year
+abx_cols <- names(amc_modified_datasets[[1]])[11:ncol(amc_modified_datasets[[1]])]
+
+compute_rate <- function(df, cols) {
+  n <- nrow(df)
+  vapply(cols, function(col) sum(df[[col]] %in% c("R","S"), na.rm=TRUE)/n, numeric(1))
+}
+rates_list <- lapply(amc_modified_datasets, compute_rate, cols = abx_cols)
+testing_rate_df <- data.frame(
+  antibiotic = abx_cols,
+  dataset1   = rates_list[[1]],
+  dataset2   = rates_list[[2]],
+  dataset3   = rates_list[[3]],
+  dataset4   = rates_list[[4]],
+  dataset5   = rates_list[[5]],
+  check.names = FALSE
+)
+testing_rate_df[,-1] <- round(testing_rate_df[,-1] * 100, 1)
+
+print(testing_rate_df)
+write.xlsx(testing_rate_df,"antibiotics_selection/test_rate_by_year.xlsx")
+
+# antibios qui ont été <10% un an ou plus:
+low_abx <- testing_rate_df$antibiotic[
+  apply(testing_rate_df[,-1] < 10, 1, any)
+]
+low_abx
 
 ##### SECTION 7: Column Filtering #####
 
 # Columns to remove
-columns_to_remove <- c("C3G", "FQ", "MEM", "PIP", "TMP", "TCC", "CN", "AZT", "CS", "TGC")
+# columns_to_remove <- c("C3G", "FQ", "MEM", "PIP", "TMP", "TCC", "CN", "AZT", "CS", "TGC") # critère : "supérieur à 10% en moyenne sur toutes les années"
+columns_to_remove <- c("C3G", "FQ", "MEM", "PIP", "TMP", "TCC", "CN", "AZT", "CS", "TGC", "AMP") # critère : "au moins 10% pour chaque année"
 
 # Filter out unnecessary columns
 filtres_colonnes <- function(dataframe, var_a_enlever) {

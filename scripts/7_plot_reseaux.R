@@ -70,8 +70,7 @@ for (i in 1:length(list_datasets)){
     if (str_detect(chemin_donnees, "sampled")){
       load(paste0(chemin_donnees, "sampled_", list_datasets[i], ".RData"))
       database <- get(paste0("sampled_", as.character(list_datasets[i])))
-    }
-    else{
+    } else{
       load(paste0(chemin_donnees, list_datasets_EC[i], ".RData"))
       database <- get(as.character(list_datasets_EC[i]))
     }

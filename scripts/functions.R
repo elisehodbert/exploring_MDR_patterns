@@ -226,6 +226,7 @@ parallel_calc_list_simul <- function(list_simul, minsup){ # Identifying patterns
       Code_eng = as.factor(Code_eng)
     )
   antibiotic_names = as.character(AM_class_dataframe$AM) # vector containing all names of antimicrobials
+  antibiotic_names <- antibiotic_names[antibiotic_names != "AMP"] # when we don't wnat to include AMP
   
   nom_list_simul <- deparse(substitute(list_simul))
    
@@ -437,8 +438,8 @@ graph_from_edges <- function(database, edges, AM_class, edge_colors, breaks, fac
   
   # To colors nodes with the appropriate pie chart :
   dat <- database %>%
-    select(all_of(AM_class$AM)) 
-  
+    select(all_of(AM_class$AM))
+
   AM_class$pieNA <- apply(dat, 2, function(AM){ # calculating NA proportion
     sum(is.na(AM))/length(AM)
   })
