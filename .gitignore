@@ -48,3 +48,5 @@ results_age_gender/*/rep*/itemset_obs/*.RData
 results_age_gender/*/rep*/itemset_filtre_0.95/*.RData
 results_age_gender/*/rep*/sampled_datasets/*.RData
 
+save_results_all_data_wth_AMP/H0_simulations/*.RData
+save_results_all_data_with_AMP/itemsets_simul/*.RData
