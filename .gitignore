@@ -40,3 +40,11 @@ results_by_age_class/results_over_65/rep*/itemsets_simul/*.RData
 
 results_by_age_class/results_bs_under_65/rep*/H0_simulations/*.RData
 results_by_age_class/results_bs_under_65/rep*/itemsets_simul/*.RData
+
+results_age_gender/*/rep*/H0_simulations/*.RData
+results_age_gender/*/rep*/itemsets_simul/*.RData
+results_age_gender/*/rep*/H0_simulations/*.RData
+results_age_gender/*/rep*/itemset_obs/*.RData
+results_age_gender/*/rep*/itemset_filtre_0.95/*.RData
+results_age_gender/*/rep*/sampled_datasets/*.RData
+
