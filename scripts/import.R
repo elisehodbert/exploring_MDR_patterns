@@ -108,3 +108,74 @@ pvalue = "0.95"
 ### Option 2 : on load directement les données
 load("data/clean_data.RData") # sans AMP
 load("data/clean_data_with_AMP.RData") # avec AMP
+
+
+
+
+# Comptage des ages:
+counts <- map_dfr(2018:2022, ~{
+  df <- get(paste0("EC_", .x))
+  n_under <- sum(df$age < 65, na.rm = TRUE)
+  n_over  <- sum(df$age >= 65, na.rm = TRUE)
+  total   <- n_under + n_over
+  tibble(
+    year          = .x,
+    under_65      = n_under,
+    under_65_pct  = round(100 * n_under / total, 1),
+    `65_and_over`   = n_over,
+    `65_and_over_pct` = round(100 * n_over / total, 1)
+  )
+})
+counts
+
+
+# Taux de test chez les hommes et chez les femmes
+taux_test <- map_dfr(2018:2022, function(y) {
+  df <- get(paste0("EC_", y))
+  df %>%
+    dplyr::filter(sexe %in% c("H", "F")) %>%
+    pivot_longer(
+      cols      = all_of(antibiotic_names),
+      names_to  = "antibio",
+      values_to = "valeur"
+    ) %>%
+    dplyr::mutate(
+      tested = !is.na(valeur),
+      year   = y
+    ) %>%
+    dplyr::group_by(year, sexe, antibio) %>%
+    dplyr::summarise(pct = 100 * mean(tested), .groups = "drop")
+}) %>%
+  pivot_wider(names_from = sexe, values_from = pct)
+taux_test
+
+# Test stat pour savoir si la proportion est la même.
+
+# 1. Fonction qui retourne resultat de prop.test pour (year, antibio)
+test_prop <- function(y, ab) {
+  df <- get(paste0("EC_", y)) %>% filter(sexe %in% c("H", "F"))
+  # Nombre de H testés / non testés sur ab
+  nH_test    <- sum(!is.na(df[[ab]]   & df$sexe == "H"), na.rm = TRUE)
+  nH_total   <- sum(df$sexe == "H", na.rm = TRUE)
+  nF_test    <- sum(!is.na(df[[ab]]   & df$sexe == "F"), na.rm = TRUE)
+  nF_total   <- sum(df$sexe == "F", na.rm = TRUE)
+  # prop.test
+  res <- prop.test(
+    x = c(nH_test, nF_test),
+    n = c(nH_total, nF_total),
+    correct = FALSE
+  )
+  tibble(
+    year    = y,
+    antibio = ab,
+    test    = "prop.test",
+    p_value = res$p.value
+  )
+}
+
+# 2. Appliquer sur toutes les années et tous les antibiotiques
+test_stats <- map_dfr(taux_test$year %>% unique(), function(y) {
+  map_dfr(unique(taux_test$antibio), ~ test_prop(y, .x))
+})
+
+print(test_stats)
