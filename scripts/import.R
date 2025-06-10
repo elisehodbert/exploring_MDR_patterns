@@ -92,7 +92,8 @@ regions = c("Auvergne_Rhone_Alpes", # defining regions we include in the study. 
 n = 100 # number of datasets to be simulated under H0
 
 # Parameters for apriori
-minsup_BLSE = 0.01 # minimum support for ESBL isolates
+#minsup_BLSE = 0.01 # minimum support for ESBL isolates
+minsup_BLSE = 0.001 # minimum support for ESBL isolates
 minsup_non_BLSE = 0.001 # minimum support for non-ESBL isolates
 
 # Parameters for pruning patterns
@@ -149,9 +150,7 @@ taux_test <- map_dfr(2018:2022, function(y) {
   pivot_wider(names_from = sexe, values_from = pct)
 taux_test
 
-# Test stat pour savoir si la proportion est la même.
-
-# 1. Fonction qui retourne resultat de prop.test pour (year, antibio)
+# Test stat pour savoir si la proportion est la même
 test_prop <- function(y, ab) {
   df <- get(paste0("EC_", y)) %>% filter(sexe %in% c("H", "F"))
   # Nombre de H testés / non testés sur ab
@@ -173,9 +172,7 @@ test_prop <- function(y, ab) {
   )
 }
 
-# 2. Appliquer sur toutes les années et tous les antibiotiques
 test_stats <- map_dfr(taux_test$year %>% unique(), function(y) {
   map_dfr(unique(taux_test$antibio), ~ test_prop(y, .x))
 })
 
-print(test_stats)
