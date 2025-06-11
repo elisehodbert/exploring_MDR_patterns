@@ -52,9 +52,10 @@ list_data_simul <- c( #Simulated data is very voluminous. We cut the lists of da
   # "2022_non_BLSE_91_100"
 )
 
-dossier_enreg = "results_minsup_ESBL/minsup_0_1/"
+# Test sur un minsup
+dossier_enreg = "results_minsup_ESBL/minsup_0_02/"
 folder_creation(dossier_enreg, 1)
-minsup_BLSE = 0.1
+minsup_BLSE = 0.02
 source("scripts/4_apriori.R")
 source("scripts/5_filtre_itemsets.R")
 source("scripts/6_describ_itemsets.R") # describing itemsets
@@ -63,47 +64,58 @@ source("scripts/7_bis_legende_reseaux.R") # drawing the legend
 list_graphs <- paste0("graph_",list_datasets,"_0.95")
 plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1) # drawing the figure with all networks
 
-dossier_enreg = "results_minsup_ESBL/minsup_0_05/"
-folder_creation(dossier_enreg, 1)
-minsup_BLSE = 0.05
-source("scripts/4_apriori.R")
-source("scripts/5_filtre_itemsets.R")
-source("scripts/6_describ_itemsets.R") # describing itemsets
-source("scripts/7_plot_reseaux.R")
-source("scripts/7_bis_legende_reseaux.R") # drawing the legend
-list_graphs <- paste0("graph_",list_datasets,"_0.95")
-plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1) # drawing the figure with all networks
 
-dossier_enreg = "results_minsup_ESBL/minsup_0_01/"
-folder_creation(dossier_enreg, 1)
-minsup_BLSE = 0.01
-source("scripts/4_apriori.R")
-source("scripts/5_filtre_itemsets.R")
-source("scripts/6_describ_itemsets.R") # describing itemsets
-source("scripts/7_plot_reseaux.R")
-source("scripts/7_bis_legende_reseaux.R") # drawing the legend
-list_graphs <- paste0("graph_",list_datasets,"_0.95")
-plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1) # drawing the figure with all networks
+# Faire tous les minsup d'un coup
+thresholds <- c(0.05, 0.01, 0.005, 0.001)
 
-dossier_enreg = "results_minsup_ESBL/minsup_0_005/"
-folder_creation(dossier_enreg, 1)
-minsup_BLSE = 0.005
-source("scripts/4_apriori.R")
-source("scripts/5_filtre_itemsets.R")
-source("scripts/6_describ_itemsets.R") # describing itemsets
-source("scripts/7_plot_reseaux.R")
-source("scripts/7_bis_legende_reseaux.R") # drawing the legend
-list_graphs <- paste0("graph_",list_datasets,"_0.95")
-plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1) # drawing the figure with all networks
+scripts <- list(
+  "scripts/4_apriori.R",
+  "scripts/5_filtre_itemsets.R",
+  "scripts/6_describ_itemsets.R",
+  "scripts/7_plot_reseaux.R",
+  "scripts/7_bis_legende_reseaux.R"
+)
 
-dossier_enreg = "results_minsup_ESBL/minsup_0_001/"
-folder_creation(dossier_enreg, 1)
-minsup_BLSE = 0.001
-source("scripts/4_apriori.R")
-source("scripts/5_filtre_itemsets.R")
-source("scripts/6_describ_itemsets.R") # describing itemsets
-source("scripts/7_plot_reseaux.R")
-source("scripts/7_bis_legende_reseaux.R") # drawing the legend
-list_graphs <- paste0("graph_",list_datasets,"_0.95")
-plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1) # drawing the figure with all networks
+for (th in thresholds) {
+  # construction du dossier (ex: "minsup_0_005")
+  suffix <- gsub("\\.", "_", format(th, scientific = FALSE))
+  dir    <- file.path("results_minsup_ESBL", paste0("minsup_", suffix))
+  
+  folder_creation(dir, 1)
+  minsup_BLSE <- th
+  
+  # exécution des scripts
+  lapply(scripts, source)
+  
+  # assemblage des graphes
+  list_graphs <- paste0("graph_", list_datasets, "_0.95")
+  plot_graphs_assemble(dir, list_graphs, "graph_assemble_0.95", 1, 1)
+}
 
+
+
+
+
+
+### Graphe densité par minsup BLSE
+
+list_minsup <- paste0("minsup_", c("0_001","0_005","0_01","0_05","0_06","0_08","0_1"))
+densities <- sapply(list_minsup, function(m) {
+  read.xlsx(file.path("results_minsup_ESBL", m, "describ_graphs_0.95.xlsx"))[1, 3]
+})
+
+densities[is.na(densities)] <- 0
+
+df <- data.frame(
+  minsup = factor(list_minsup, levels = list_minsup,
+                  labels = gsub("_", ".", sub("minsup_", "", list_minsup))),
+  density = densities,
+  stringsAsFactors = FALSE
+)
+
+ggplot(df, aes(x = minsup, y = density, group = 1)) +
+  geom_line() +
+  geom_point() +
+  scale_x_discrete(expand = expansion(mult = c(0.02, 0.02))) +
+  labs(x = "minsup", y = "density") +
+  theme_minimal()
