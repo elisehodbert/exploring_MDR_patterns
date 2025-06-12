@@ -53,9 +53,9 @@ list_data_simul <- c( #Simulated data is very voluminous. We cut the lists of da
 )
 
 # Test sur un minsup
-dossier_enreg = "results_minsup_ESBL/minsup_0_02/"
+dossier_enreg = "results_minsup_ESBL/minsup_0_015/"
 folder_creation(dossier_enreg, 1)
-minsup_BLSE = 0.02
+minsup_BLSE = 0.015
 source("scripts/4_apriori.R")
 source("scripts/5_filtre_itemsets.R")
 source("scripts/6_describ_itemsets.R") # describing itemsets
@@ -66,7 +66,7 @@ plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1) # 
 
 
 # Faire tous les minsup d'un coup
-thresholds <- c(0.05, 0.01, 0.005, 0.001)
+thresholds <- c(0.013, 0.014, 0.011, 0.012)
 
 scripts <- list(
   "scripts/4_apriori.R",
@@ -77,21 +77,22 @@ scripts <- list(
 )
 
 for (th in thresholds) {
-  # construction du dossier (ex: "minsup_0_005")
+  # construction du chemin directement dans dossier_enreg
   suffix <- gsub("\\.", "_", format(th, scientific = FALSE))
-  dir    <- file.path("results_minsup_ESBL", paste0("minsup_", suffix))
+  dossier_enreg <- file.path("results_minsup_ESBL", paste0("minsup_", suffix), "")
+  dossier_enreg <- paste0(dossier_enreg,"/")
   
-  folder_creation(dir, 1)
+  # création du dossier et mise à jour du minsup
+  folder_creation(dossier_enreg, 1)
   minsup_BLSE <- th
   
-  # exécution des scripts
+  # exécution des scripts qui utilisent dossier_enreg et minsup_BLSE
   lapply(scripts, source)
   
-  # assemblage des graphes
+  # assemblage des graphes dans ce même dossier
   list_graphs <- paste0("graph_", list_datasets, "_0.95")
-  plot_graphs_assemble(dir, list_graphs, "graph_assemble_0.95", 1, 1)
+  plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1)
 }
-
 
 
 
@@ -99,7 +100,7 @@ for (th in thresholds) {
 
 ### Graphe densité par minsup BLSE
 
-list_minsup <- paste0("minsup_", c("0_001","0_005","0_01","0_05","0_06","0_08","0_1"))
+list_minsup <- paste0("minsup_", c("0_001","0_005","0_01","0_011","0_012","0_013","0_014","0_015","0_02","0_05","0_06","0_08","0_1"))
 densities <- sapply(list_minsup, function(m) {
   read.xlsx(file.path("results_minsup_ESBL", m, "describ_graphs_0.95.xlsx"))[1, 3]
 })
