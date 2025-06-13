@@ -94,3 +94,30 @@ mk.test(nb_obs_patterns_ESBL)
 mk.test(nb_obs_patterns_non_ESBL)
 mk.test(nb_pruned_patterns_ESBL)
 mk.test(nb_pruned_patterns_non_ESBL)
+
+# nombre d'isolats de +65 years old
+
+resultats_tidy <- map_dfr(2018:2022, ~ {
+  df <- get(paste0("EC_", .x))
+  
+  # Comptages
+  nb_fem_65p   <- df %>% filter(sexe == "H", age >= 65) %>% nrow()
+  nb_fem_total <- df %>% filter(sexe == "H", !is.na(age)) %>% nrow()
+  
+  tibble(
+    annee             = .x,
+    nb_femmes_65_plus = nb_fem_65p,
+    nb_femmes_total   = nb_fem_total,
+    pct_femmes_65p    = if (nb_fem_total > 0) nb_fem_65p / nb_fem_total * 100 else NA_real_
+  )
+})
+
+print(resultats_tidy)
+
+pearson_test <- cor.test(
+  x      = resultats_tidy$annee,
+  y      = resultats_tidy$pct_femmes_65p,
+  method = "pearson"
+)
+print(pearson_test)
+
