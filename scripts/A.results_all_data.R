@@ -121,3 +121,47 @@ pearson_test <- cor.test(
 )
 print(pearson_test)
 
+# testing the  trends of eSup and cLift cut off values
+
+df_cutoff = read.xlsx("save_results_all_data_with_AMP/summary_cut_off_values0.95.xlsx")
+df_cutoff <- df_cutoff %>%
+  mutate(
+    year  = as.integer(substr(dataset, 1, 4)),
+    group = gsub("^[0-9]{4}_", "", dataset)
+  )
+
+# 2) Boucle simple sur groupes et métriques
+results <- list()
+for (grp in unique(df_cutoff$group)) {
+  df_g <- filter(df_cutoff, group == grp)
+  for (metric in c("cut_off_eSup", "cut_off_cLift")) {
+    # fit linéaire
+    fit <- lm(as.formula(paste(metric, "~ year")), data = df_g)
+    res <- residuals(fit)
+    # tests d’hypothèses
+    ok_norm <- shapiro.test(res)$p.value > 0.05
+    ok_homo <- bptest(fit)$p.value      > 0.05
+    # choix du test
+    method <- if (ok_norm && ok_homo) "pearson" else "kendall"
+    cor_t  <- cor.test(df_g$year, df_g[[metric]],
+                       method = method,
+                       alternative = "greater")
+    mk_t   <- mk.test(df_g[[metric]], alternative = "greater")
+    # stocker
+    results[[paste(grp, metric, sep = "_")]] <-
+      list(
+        group         = grp,
+        metric        = metric,
+        method_used   = method,
+        pearson_p     = cor_t$p.value,
+        pearson_stat  = cor_t$estimate,
+        mk_p          = mk_t$p.value,
+        mk_stat       = mk_t$statistic
+      )
+  }
+}
+
+# 3) Convertir en data.frame pour résumé
+library(tibble)
+res_df <- bind_rows(results)
+print(res_df)

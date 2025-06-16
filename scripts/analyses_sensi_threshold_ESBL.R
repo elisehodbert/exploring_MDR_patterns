@@ -101,6 +101,9 @@ for (th in thresholds) {
 ### Graphe densité par minsup BLSE
 
 list_minsup <- paste0("minsup_", c("0_001","0_005","0_01","0_011","0_012","0_013","0_014","0_015","0_02","0_05","0_06","0_08","0_1"))
+list_minsup <- paste0("minsup_", c("0_001","0_005","0_01","0_02","0_05","0_06","0_08","0_1"))
+list_minsup <- paste0("minsup_", c("0_001","0_005","0_01","0_02","0_05","0_1"))
+
 densities <- sapply(list_minsup, function(m) {
   read.xlsx(file.path("results_minsup_ESBL", m, "describ_graphs_0.95.xlsx"))[1, 3]
 })
