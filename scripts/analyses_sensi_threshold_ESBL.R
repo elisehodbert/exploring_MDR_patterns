@@ -1,12 +1,11 @@
-dossier_enreg = "results_all_data/"
 chemin_donnees = "data/"
 
 list_datasets = c(
-  "2018_BLSE"
+  "2018_BLSE",
   # "2019_BLSE",
   # "2020_BLSE",
   # "2021_BLSE",
-  # "2022_BLSE"
+  "2022_BLSE"
   # "2018_non_BLSE",
   # "2019_non_BLSE",
   # "2020_non_BLSE",
@@ -16,11 +15,11 @@ list_datasets = c(
 
 
 list_data_simul <- c( #Simulated data is very voluminous. We cut the lists of datasets into smaller lists so that the computer does not crash
-  "2018_BLSE"
+  "2018_BLSE",
   # "2019_BLSE",
   # "2020_BLSE",
   # "2021_BLSE",
-  # "2022_BLSE"
+  "2022_BLSE"
   # "2018_non_BLSE_1_20",
   # "2018_non_BLSE_21_40",
   # "2018_non_BLSE_41_60",
@@ -53,9 +52,9 @@ list_data_simul <- c( #Simulated data is very voluminous. We cut the lists of da
 )
 
 # Test sur un minsup
-dossier_enreg = "results_minsup_ESBL/minsup_0_015/"
-folder_creation(dossier_enreg, 1)
-minsup_BLSE = 0.015
+dossier_enreg = "results_minsup_ESBL/minsup_0_001/"
+folder_creation(dossier_enreg, 10)
+minsup_BLSE = 0.001
 source("scripts/4_apriori.R")
 source("scripts/5_filtre_itemsets.R")
 source("scripts/6_describ_itemsets.R") # describing itemsets
@@ -64,6 +63,21 @@ source("scripts/7_bis_legende_reseaux.R") # drawing the legend
 list_graphs <- paste0("graph_",list_datasets,"_0.95")
 plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1) # drawing the figure with all networks
 
+
+for (essai in 1:10){
+  set.seed(21*essai)
+  dossier_enreg = paste0("results_minsup_ESBL/minsup_0_001/", essai, "/")
+  chemin_donnees = paste0("results_minsup_ESBL/minsup_0_001/", essai, "/sampled_datasets/")
+  minsup_BLSE = 0.001
+  source("scripts/3_simulation_bdd.R")
+  source("scripts/4_apriori.R")
+  source("scripts/5_filtre_itemsets.R")
+  source("scripts/6_describ_itemsets.R") # describing itemsets
+  source("scripts/7_plot_reseaux.R")
+  source("scripts/7_bis_legende_reseaux.R") # drawing the legend
+  list_graphs <- paste0("graph_",list_datasets,"_0.95")
+  plot_graphs_assemble(dossier_enreg, list_graphs, "graph_assemble_0.95", 1, 1) # drawing the figure with all networks
+}
 
 # Faire tous les minsup d'un coup
 thresholds <- c(0.013, 0.014, 0.011, 0.012)
