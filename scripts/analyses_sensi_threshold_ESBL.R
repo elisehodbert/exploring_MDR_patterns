@@ -137,3 +137,38 @@ ggplot(df, aes(x = minsup, y = density, group = 1)) +
   scale_x_discrete(expand = expansion(mult = c(0.02, 0.02))) +
   labs(x = "minsup", y = "density") +
   theme_minimal()
+
+### Calculer la densité (médiane, IC) pour minsup BLSE = 0.001 (2018)
+
+# on crée la liste des sous-dossiers rep1 à rep10
+list_reps <- paste0("minsup_0_001/rep", 1:10)
+
+# on parcourt chacun pour en extraire la densité (cellule [1,3])
+densities <- sapply(list_reps, function(m) {
+  read.xlsx(
+    file.path("results_minsup_ESBL", m, "describ_graphs_0.95.xlsx")
+  )[1, 3]
+})
+
+# nommer le vecteur pour plus de clarté
+names(densities) <- paste0("rep", 1:10)
+
+densities
+
+### Calculer la densité (médiane, IC) pour minsup BLSE = 0.001 (2022)
+
+# on crée la liste des sous-dossiers rep1 à rep10
+list_reps <- paste0("minsup_0_001/rep", 1:10)
+
+# on parcourt chacun pour en extraire la densité (cellule [2,3])
+densities <- sapply(list_reps, function(m) {
+  read.xlsx(
+    file.path("results_minsup_ESBL", m, "describ_graphs_0.95.xlsx")
+  )[2, 3]
+})
+
+# nommer le vecteur pour plus de clarté
+names(densities) <- paste0("rep", 1:10)
+
+densities
+
