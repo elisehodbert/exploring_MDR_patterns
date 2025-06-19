@@ -88,39 +88,3 @@ itemsets_list_non_BLSE <- itemsets_all[6:10]
 
 CRS_BLSE = compute_CRS(itemsets_list_BLSE)
 CRS_non_BLSE = compute_CRS(itemsets_list_non_BLSE)
-
-
-
-
-for (i in 1:length(list_data)){
-  load(paste0("save_results_all_data_with_AMP/itemset_filtre_", pvalue, "/itemset_filtre_", pvalue, "_", list_data[i], ".RData"))
-}
-itemsets_2018_BLSE <- inspect(slot(itemset_filtre_0.95_2018_BLSE,"items"))$items
-itemsets_2019_BLSE <- inspect(slot(itemset_filtre_0.95_2019_BLSE,"items"))$items
-itemsets_2020_BLSE <- inspect(slot(itemset_filtre_0.95_2020_BLSE,"items"))$items
-itemsets_2021_BLSE <- inspect(slot(itemset_filtre_0.95_2021_BLSE,"items"))$items
-itemsets_2022_BLSE <- inspect(slot(itemset_filtre_0.95_2022_BLSE,"items"))$items
-
-
-itemsets_2018_non_BLSE <- inspect(slot(itemset_filtre_0.95_2018_non_BLSE,"items"))$items
-itemsets_2019_non_BLSE <- inspect(slot(itemset_filtre_0.95_2019_non_BLSE,"items"))$items
-itemsets_2020_non_BLSE <- inspect(slot(itemset_filtre_0.95_2020_non_BLSE,"items"))$items
-itemsets_2021_non_BLSE <- inspect(slot(itemset_filtre_0.95_2021_non_BLSE,"items"))$items
-itemsets_2022_non_BLSE <- inspect(slot(itemset_filtre_0.95_2022_non_BLSE,"items"))$items
-
-
-itemsets_list_BLSE <- list(itemsets_2018_BLSE, itemsets_2019_BLSE, itemsets_2020_BLSE, itemsets_2021_BLSE, itemsets_2022_BLSE)
-itemsets_list_non_BLSE <- list(itemsets_2018_non_BLSE, itemsets_2019_non_BLSE, itemsets_2020_non_BLSE, itemsets_2021_non_BLSE, itemsets_2022_non_BLSE)
-
-
-# Calculer le CRS pour l'année 2021
-CRS_BLSE <- calculate_CRS(itemsets_list_BLSE)
-CRS_BLSE
-CRS_non_BLSE <- calculate_CRS(itemsets_list_non_BLSE)
-CRS_non_BLSE
-
-
-
-# Afficher le résultat
-print(paste("CRS BLSE:", CRS_BLSE))
-print(paste("CRS non BLSE:", CRS_non_BLSE))
