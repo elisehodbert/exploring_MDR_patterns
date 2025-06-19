@@ -43,68 +43,74 @@ data.frame(dataset = list_data, overlap = res)
 
 
 
-
-# Fonction pour calculer la Cumulative Rule Stability (CRS)
-calculate_crs <- function(rulesets) {
-  num_rulesets <- length(rulesets)
-  cumulative_stability <- numeric(num_rulesets - 1)
+# Fonction CRS utilisant la fonction calc_set_overlap_ratio fournie
+compute_CRS <- function(R_list) {
+  n   <- length(R_list)
+  CRS <- rep(NA_real_, n)  # on initialise un vecteur de length n avec NA
   
-  for (i in 1:(num_rulesets - 1)) {
-    ruleset_A <- rulesets[i]
-    ruleset_B <- rulesets[i + 1]
-    
-    shared_rules <- intersect(ruleset_A, ruleset_B)
-    
-    if (length(shared_rules) > 0) {
-      # Calcul de la stabilité cumulative pour les règles partagées
-      stability_values <- sapply(shared_rules, function(rule) {
-        set_overlap_ratio <- calc_set_overlap_ratio(rule$lhs, subset(ruleset_B, subset = lhs %in% rule$lhs)$lhs)
-        return(set_overlap_ratio)
-      })
-      
-      # Moyenne des valeurs de ROR pour les règles partagées
-      cumulative_stability[i] <- mean(stability_values)
-    }
+  if (n < 2) {
+    warning("Il faut au moins deux ensembles de règles pour calculer CRS")
+    return(CRS)
   }
   
-  return(cumulative_stability)
-}
-
-
-
-calculate_CRS <- function(itemsets_list) {
-  # Vérifier que la liste d'itemsets est non vide
-  if (length(itemsets_list) < 2) {
-    stop("La liste d'itemsets doit contenir au moins deux ensembles.")
+  # i = 1
+  CRS[1] <- calc_set_overlap_ratio(R_list[[1]], R_list[[2]])
+  
+  # i > 1 (jusqu'à n-1)
+  for (i in 2:(n-1)) {
+    overlap_i     <- calc_set_overlap_ratio(R_list[[i]], R_list[[i+1]])
+    CRS[i]        <- ((i - 1) * CRS[i-1] + overlap_i) / i
   }
   
-  # Initialiser le CRS pour la première année
-  CRS <- rule_overlap(itemsets_list[[1]], itemsets_list[[2]])
-  
-  # Calculer le CRS pour les années suivantes
-  for (i in 2:(length(itemsets_list) - 1)) {
-    overlap <- rule_overlap(itemsets_list[[i]], itemsets_list[[i + 1]])
-    CRS <- (1/i) * ((i-1) * CRS + overlap)
-  }
-  
+  # CRS[n] reste NA car pas de R_{n+1}
   return(CRS)
 }
 
+# Calcul du CRS sur toutes les années, séparément pour BLSE et non-BLSE
+
+# on charge et on extrait tout en une passe
+itemsets_all <- lapply(setNames(list_data, list_data), function(ld) {
+  # chemin du fichier .RData
+  f <- sprintf(
+    "save_results_all_data_with_AMP/itemset_filtre_%s/itemset_filtre_%s_%s.RData",
+    pvalue, pvalue, ld
+  )
+  load(f, envir = environment())  # charge dans l’environnement courant
+  # reconstitue le nom de l’objet chargé
+  obj <- get(sprintf("itemset_filtre_%s_%s", pvalue, ld))
+  inspect(slot(obj, "items"))$items
+})
+
+# on scinde en deux listes
+itemsets_list_BLSE     <- itemsets_all[1:5]
+itemsets_list_non_BLSE <- itemsets_all[6:10]
 
 
-# Exemple d'utilisation avec des itemsets pour les années 2018 à 2021
+CRS_BLSE = compute_CRS(itemsets_list_BLSE)
+CRS_non_BLSE = compute_CRS(itemsets_list_non_BLSE)
+
+
+
+
+for (i in 1:length(list_data)){
+  load(paste0("save_results_all_data_with_AMP/itemset_filtre_", pvalue, "/itemset_filtre_", pvalue, "_", list_data[i], ".RData"))
+}
 itemsets_2018_BLSE <- inspect(slot(itemset_filtre_0.95_2018_BLSE,"items"))$items
 itemsets_2019_BLSE <- inspect(slot(itemset_filtre_0.95_2019_BLSE,"items"))$items
 itemsets_2020_BLSE <- inspect(slot(itemset_filtre_0.95_2020_BLSE,"items"))$items
 itemsets_2021_BLSE <- inspect(slot(itemset_filtre_0.95_2021_BLSE,"items"))$items
+itemsets_2022_BLSE <- inspect(slot(itemset_filtre_0.95_2022_BLSE,"items"))$items
+
 
 itemsets_2018_non_BLSE <- inspect(slot(itemset_filtre_0.95_2018_non_BLSE,"items"))$items
 itemsets_2019_non_BLSE <- inspect(slot(itemset_filtre_0.95_2019_non_BLSE,"items"))$items
 itemsets_2020_non_BLSE <- inspect(slot(itemset_filtre_0.95_2020_non_BLSE,"items"))$items
 itemsets_2021_non_BLSE <- inspect(slot(itemset_filtre_0.95_2021_non_BLSE,"items"))$items
+itemsets_2022_non_BLSE <- inspect(slot(itemset_filtre_0.95_2022_non_BLSE,"items"))$items
 
-itemsets_list_BLSE <- list(itemsets_2018_BLSE, itemsets_2019_BLSE, itemsets_2020_BLSE, itemsets_2021_BLSE)
-itemsets_list_non_BLSE <- list(itemsets_2018_non_BLSE, itemsets_2019_non_BLSE, itemsets_2020_non_BLSE, itemsets_2021_non_BLSE)
+
+itemsets_list_BLSE <- list(itemsets_2018_BLSE, itemsets_2019_BLSE, itemsets_2020_BLSE, itemsets_2021_BLSE, itemsets_2022_BLSE)
+itemsets_list_non_BLSE <- list(itemsets_2018_non_BLSE, itemsets_2019_non_BLSE, itemsets_2020_non_BLSE, itemsets_2021_non_BLSE, itemsets_2022_non_BLSE)
 
 
 # Calculer le CRS pour l'année 2021
