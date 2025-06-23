@@ -76,10 +76,48 @@ colnames(tbl) <- as.character(years)
 print(tbl)
 
 
+# Barplot pour mieux visualiser les résultats
+# 0. Conversion de la matrice en tibble avec une colonne 'Metric'
+tbl_df <- as.data.frame(tbl, stringsAsFactors = FALSE) %>% 
+  rownames_to_column(var = "Metric")
 
+# 1. Passage en format “long”
+tbl_long <- tbl_df %>%
+  pivot_longer(
+    cols = matches("^[0-9]{4}$"),   # toutes les colonnes années (2018–2022)
+    names_to  = "Year",
+    values_to = "CI_str"
+  ) %>%
+  separate(CI_str, into = c("Estimate", "CI_range"), sep = " ", extra = "merge") %>%
+  mutate(
+    Estimate = as.numeric(Estimate),
+    CI_range = str_remove_all(CI_range, "\\[|\\]"),
+    Lower    = as.numeric(str_extract(CI_range, "^[0-9\\.]+")),
+    Upper    = as.numeric(str_extract(CI_range, "(?<=–)[0-9\\.]+"))
+  )
 
+custom_labels <- c(
+  "ROR hommes/femmes BLSE"       = "ROR by gender (ESBL-EC)",
+  "ROR hommes/femmes non BLSE"   = "ROR by gender (non-ESBL-EC)",
+  "ROR -65/65+ BLSE"             = "ROR by age class (ESBL-EC)",
+  "ROR -65/65+ non BLSE"         = "ROR by age class (non-ESBL-EC) "
+)
 
-
+# graphe
+ggplot(tbl_long, aes(x = Year, y = Estimate)) +
+  geom_col(fill = "steelblue") +
+  geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0.2) +
+  facet_wrap(~ Metric, ncol = 2, scales = "fixed",     labeller = labeller(Metric = custom_labels)
+) +
+  labs(
+    x     = "Year",
+    y     = "Rule Overlap Ratio (ROR)",
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text  = element_text(size = 11, face = "bold")
+  )
 
 
 # Fonction CRS utilisant la fonction calc_set_overlap_ratio fournie
