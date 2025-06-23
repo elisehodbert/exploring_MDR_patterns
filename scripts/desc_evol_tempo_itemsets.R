@@ -1,11 +1,10 @@
-## Calcul du Rule Overlap Ratio (ROR) pour rep1–rep10
+## Calcul du Rule Overlap Ratio (ROR) pour rep1–rep10 et mise en forme tableau final
 
 # 1. Paramètres
+digits <- 2
 pvalue <- "0.95"
-datasets <- c(
-  "2018_BLSE", "2019_BLSE", "2020_BLSE", "2021_BLSE", "2022_BLSE",
-  "2018_non_BLSE", "2019_non_BLSE", "2020_non_BLSE", "2021_non_BLSE", "2022_non_BLSE"
-)
+years <- 2018:2022
+datasets <- paste0(rep(years, 2), c("_BLSE", "_non_BLSE"))
 reps <- paste0("rep", 1:10)
 
 # 2. Ratio d'intersection / union
@@ -14,8 +13,8 @@ calc_set_overlap_ratio <- function(A, B) {
   length(intersect(A, B)) / length(union(A, B))
 }
 
-# 3. Fonction générique pour calculer ROR entre deux dossiers
-compute_ROR <- function(path_m_prefix, path_w_prefix) {
+# 3. Fonction générique pour calculer ROR
+compute_ROR <- function(path_m, path_w) {
   df <- expand.grid(
     dataset = datasets,
     rep = reps,
@@ -23,66 +22,59 @@ compute_ROR <- function(path_m_prefix, path_w_prefix) {
   )
   df$overlap <- mapply(
     function(d, r) {
-      # Chemin vers le dossier itemset_filtre_<pvalue>
-      file_m <- file.path(
-        path_m_prefix, r,
-        paste0("itemset_filtre_", pvalue),
-        sprintf("itemset_filtre_%s_%s.RData", pvalue, d)
-      )
-      file_w <- file.path(
-        path_w_prefix, r,
-        paste0("itemset_filtre_", pvalue),
-        sprintf("itemset_filtre_%s_%s.RData", pvalue, d)
-      )
-      if (!file.exists(file_m) || !file.exists(file_w)) {
-        # Avertissement si fichier manquant
-        warning(sprintf("Fichier manquant pour %s/%s: %s ou %s", d, r, file_m, file_w))
-        return(NA_real_)
-      }
-      # Chargement dans environnements séparés
+      file_m <- file.path(path_m, r,
+                          paste0("itemset_filtre_", pvalue),
+                          sprintf("itemset_filtre_%s_%s.RData", pvalue, d))
+      file_w <- file.path(path_w, r,
+                          paste0("itemset_filtre_", pvalue),
+                          sprintf("itemset_filtre_%s_%s.RData", pvalue, d))
+      if (!file.exists(file_m) || !file.exists(file_w)) return(NA_real_)
       env_m <- new.env(); load(file_m, envir = env_m)
       env_w <- new.env(); load(file_w, envir = env_w)
-      obj_name <- sprintf("itemset_filtre_%s_%s", pvalue, d)
-      A <- env_m[[obj_name]]
-      B <- env_w[[obj_name]]
-      calc_set_overlap_ratio(A, B)
+      obj <- sprintf("itemset_filtre_%s_%s", pvalue, d)
+      calc_set_overlap_ratio(env_m[[obj]], env_w[[obj]])
     },
     df$dataset, df$rep
   )
   df
 }
 
-# 4. ROR Hommes vs Femmes
+# 4. Calculs pour chaque comparaison
 res_gender <- compute_ROR(
-  path_m_prefix = "results_by_gender/results_bs_men",
-  path_w_prefix = "results_by_gender/results_sampled_women_size_men"
+  path_m = "results_by_gender/results_bs_men",
+  path_w = "results_by_gender/results_sampled_women_size_men"
+)
+res_age    <- compute_ROR(
+  path_m = "results_by_age_class/results_over_65",
+  path_w = "results_by_age_class/results_bs_under_65"
 )
 
-# 5. ROR +65 vs -65
-res_age <- compute_ROR(
-  path_m_prefix = "results_by_age_class/results_over_65",
-  path_w_prefix = "results_by_age_class/results_bs_under_65"
-)
+# 5. Formatage des cellules
+format_cell <- function(q) sprintf(paste0("%.", digits, "f [%.", digits, "f–%.", digits, "f]"),
+                                   q[2], q[1], q[3])
 
-# 6. Affichage des résultats
-print("ROR Hommes vs Femmes:")
-print(res_gender)
-print("ROR +65 vs -65:")
-print(res_age)
-
-# 5. Résumé statistique (médiane et IC 95%)
-summarize_ROR <- function(df) {
-  vals <- df$overlap
-  quantile(vals, probs = c(0.025, 0.5, 0.975), na.rm = TRUE)
+# 6. Résumé par clé (BLSE / non_BLSE)
+summarize_key <- function(df, suffix) {
+  sapply(years, function(y) {
+    key <- paste0(y, "_", suffix)
+    vals <- df$overlap[df$dataset == key]
+    q <- quantile(vals, probs = c(0.025, 0.5, 0.975), na.rm = TRUE)
+    format_cell(q)
+  })
 }
-summary_gender <- summarize_ROR(res_gender)
-summary_age <- summarize_ROR(res_age)
 
-# 6. Affichage des résultats
-cat("Résumé ROR Hommes vs Femmes (2.5%, médiane, 97.5%):\n")
-print(summary_gender)
-cat("\nRésumé ROR +65 vs -65 (2.5%, médiane, 97.5%):\n")
-print(summary_age)
+# 7. Construction du tableau final
+tbl <- rbind(
+  `ROR hommes/femmes BLSE`     = summarize_key(res_gender,    "BLSE"),
+  `ROR hommes/femmes non BLSE` = summarize_key(res_gender,    "non_BLSE"),
+  `ROR -65/65+ BLSE`           = summarize_key(res_age,       "BLSE"),
+  `ROR -65/65+ non BLSE`       = summarize_key(res_age,       "non_BLSE")
+)
+colnames(tbl) <- as.character(years)
+
+# 8. Affichage
+print(tbl)
+
 
 
 
