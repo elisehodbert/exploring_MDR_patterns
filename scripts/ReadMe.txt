@@ -1,49 +1,47 @@
-1_data_prep (environ 3 minutes)
+Overview
+This repository contains scripts and functions to analyze antibiotic resistance patterns using antibiotic susceptibility test (AST) data. The workflow includes data preparation, simulations under the null hypothesis, application of association rule mining to detect significant resistance patterns, and descirptive graphs to visualize them.
 
-Importation des données brutes d'antibiogrammes, modification des jeux de données :
-- suppression des colonnes contenant des antibiotiques qu'on n'étudie pas finalement
-- mise en forme des colonnes
-- suppression des lignes contenant des carbapénémases
-- création de jeux de données séparés pour les BLSE et non-BLSE
+functions.R : useful functions for all scripts.
 
-Et sauvegarde des jeux de données modifiés dans un fichier "donnees.RData"
+Scripts
+1_data_prep.R (approx. 3 minutes)
+Purpose: Import raw antibiogram data.
 
-2_graphes_descriptifs
-Prend en entrée le fichier donnees.RData
-Rend en sortie, pour les bactéries BLSE et non-BLSE :
-- pour chaque année et type (BLSE / non-BLSE), histogrammes de prévalence de résistance aux antibiotiques
-- pour chaque année et type (BLSE / non-BLSE), histogrammes de nombre de résistances aux antibiotiques
+Preprocess data:
+Remove columns for antibiotics that will not be studied.
+Format columns properly.
+Filter out rows containing carbapenemase-producing bacteria.
+Split the data into two datasets: ESBL (extended-spectrum beta-lactamase) and non-ESBL.
 
-3_simulation_bdd (environ 45 minutes)
-Pour chaque jeu de données (combinaison année / BLSE ou non-BLSE), simulation de 100 jeux de données sous l'hypothèse H0 : Les résistances aux antibiotiques sont indépendantes.
+Output:
+Two cleaned datasets (ESBL and non-ESBL) saved into donnees.RData.
 
-4_apriori
-Application de l'algorithme Apriori sur
-1. les bases de données observées
-2. les bases de données simulées, en utilisant du calcul en parallèle
+3_simulation_bdd.R (approx. 45 minutes)
+Purpose:
+Simulate 100 datasets per year and per bacteria type (ESBL vs. non-ESBL), under the null hypothesis that antibiotic resistances are independent.
 
-5_filtre_itemsets
-Filtre des itemsets observés à partir des mesures de qualité (eSupport et cLift)
+4_apriori.R
+Description:
+Run the Apriori algorithm on:
+Observed datasets.
+Simulated datasets using parallel computing.
 
-6_describ_itemsets
-Descirption des itemsets observés:
-- nombre d'itemsets après filtre par minsup
-- nombre d'itemsets après filtre par eSup et cLift
-- distribution du nombre d'antibiotiques par pattern (?)
-- distribution du nombre de familles d'antibiotiques par pattern (?)
-- patterns les plus fréquents '?)
+5_filtre_itemsets.R
+Purpose:
+Filter observed itemsets based on quality measures (eSup and cLift).
 
-7_plot_reseau
-Affichage des associations restantes sous la forme d'un plot réseau
+6_describ_itemsets.R
+Purpose:
+Provide summary statistics for observed itemsets:
+Count of itemsets after minimum support filter.
+Count of itemsets after applying eSupport and cLift thresholds.
+Distribution of number of antibiotics per pattern.
+Distribution of number of antibiotic classes per pattern.
+Top most frequent patterns.
+
+7_plot_reseau.4
+Purpose:
+Visualize the significant associations that pass all filters as a network graph.
 
 
-
-
-Scripts contenant des fonctions :
-
-asso_rule_mining_functions : description dans le fichier word associé
-
-verif_calcul_cLift : pour vérifier que ma manière de calculer le cLift donne bien les mêmes résultats que la manière de Cazer 2021.
-
-plot_functions : faire un fichier word pour expliquer
 
