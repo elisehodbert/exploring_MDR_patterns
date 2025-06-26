@@ -433,9 +433,9 @@ graph_from_edges <- function(database, edges, AM_class, edge_colors, breaks, fac
   E(graph)$QM <- as.character(edges$"cLiftBin")
   E(graph)$color <- edge_colors[match(E(graph)$QM, names(edge_colors))] # edge color based in binned clift
   
-  # E(graph)$width <- edges$weight * fact_mult
-  # E(graph)$width = replace(E(graph)$width, E(graph)$width >4, 4)
-  E(graph)$width <- 1
+  E(graph)$width <- edges$weight * fact_mult
+  E(graph)$width = replace(E(graph)$width, E(graph)$width >4, 4)
+  # E(graph)$width <- 1
   
   # To colors nodes with the appropriate pie chart :
   dat <- database %>%

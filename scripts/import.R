@@ -63,8 +63,8 @@ AM_class_dataframe <- read_excel("data/AM_class_for_network_plot.xlsx") %>%
     Code = as.factor(Code),
     Code_eng = as.factor(Code_eng)
   )
-AM_class_dataframe <- AM_class_dataframe %>%
-  filter(AM != "AMP")
+# AM_class_dataframe <- AM_class_dataframe %>%
+#   filter(AM != "AMP")
 
 antibiotic_names = as.character(AM_class_dataframe$AM) # vector containing all names of antimicrobials
 antibiotic_names <- antibiotic_names[antibiotic_names != "AMP"] # when we don't wnat to include AMP
