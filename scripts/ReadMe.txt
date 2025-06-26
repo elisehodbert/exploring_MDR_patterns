@@ -39,7 +39,7 @@ Distribution of number of antibiotics per pattern.
 Distribution of number of antibiotic classes per pattern.
 Top most frequent patterns.
 
-7_plot_reseau.4
+7_plot_reseau.R
 Purpose:
 Visualize the significant associations that pass all filters as a network graph.
 
