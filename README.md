@@ -1,66 +1,79 @@
-# Exploring multidrug resistance patterns in community-acquired  E; . coli   urinary tract infections with machine learning
+# Exploring Multidrug Resistance Patterns in Community-Acquired *E. coli* Urinary Tract Infections Using Machine Learning
 
-Code repository.
+This repository contains code and data for the analysis of multidrug resistance patterns in community-acquired *Escherichia coli* urinary tract infections using various machine learning techniques.
 
-## Data repository
+---
 
-Contains the antibiotic surveillance datasets
+## Data Repository
 
-# Scripts folder
+This folder contains the antibiotic surveillance datasets used in the study.
 
-Contains all the scripts to perform the analyses:
+---
 
-main: importing all the necessary packages, defining parameters, launching successive scripts
-functions: contains all the functions we defined for this study
+## Scripts Folder
 
-1_data_prep : preprocessing of the datasets
-2_data_description : creation of figure 1 (individual antibiotic resistance prevalence)
-3_simulation_bdd : simulation of the datasets under the hypothesis of mutual independence of the resistance traits
-4_apriori : applying the apriori algorithm to the observed and simulated datasets
-5_filtre_itemsets : pruning the patterns returned by apriori using eSup and cLift
-6_describ_itemsets: description of the patterns selected after pruning
-7_plot_reseaux: creation and plotting of the network
-7_bis_legende_reseaux: plotting of the network figure legend
+This folder includes all scripts required to perform the analyses.
 
-A.results_all_data: performing the analyses for all the datasets from 2018 to 2022
-B.bootstrap_2018: bootstrapping the 2018 dataset and performing the analyses on the bootstrapped datasets
-C.analyses_samples_2018_size: subsampling the datasets from 2019 to 2022 at the size of the 2018 dataset and performing the analyses on the subsampled datasets
-D.analyses_samples_regional_prop: creating datasets with a number of isolates proportional to the regional populations and performing the analyses
-E.analyses_by_age_class: performing the stratified analyses by age class
-F.analyses_by_gender : performing the analyses stratified by gender
+### Core Scripts
 
-## Results folder
+- `main` : Imports necessary packages, defines parameters, and sequentially runs the scripts  
+- `functions` : Contains all custom functions defined for this study
 
-### Results_all_data
+### Analysis Steps
 
-Contains the results of the analyses conducted on the whole datasets from 2018 to 2022
+- `1_data_prep` : Dataset preprocessing  
+- `2_data_description` : Generates Figure 1 (individual antibiotic resistance prevalence)  
+- `3_simulation_bdd` : Simulates datasets under the hypothesis of mutual independence of resistance traits  
+- `4_apriori` : Applies the Apriori algorithm to both observed and simulated datasets  
+- `5_filtre_itemsets` : Prunes the Apriori results using `eSup` and `cLift`  
+- `6_describ_itemsets` : Describes the selected patterns after pruning  
+- `7_plot_reseaux` : Creates and plots the network of resistance patterns  
+- `7_bis_legende_reseaux` : Plots the legend for the network figure
 
-### Results_bs_2018
+### Extended Analyses
 
-Contains the results of the bootstrapped datasets of 2018
+- `A_results_all_data` : Analyzes the complete datasets from 2018 to 2022  
+- `B_bootstrap_2018` : Bootstraps the 2018 dataset and analyzes the resamples  
+- `C_analyses_samples_2018_size` : Subsamples 2019–2022 datasets to match the 2018 sample size  
+- `D_analyses_samples_regional_prop` : Creates datasets proportionate to regional populations  
+- `E_analyses_by_age_class` : Performs stratified analyses by age class  
+- `F_analyses_by_gender` : Performs stratified analyses by gender
 
-### Results_by_age_class
+---
 
-Contains the results of the analyses stratified by age class :
+## Results Folder
 
-- results for individuals under 65 from 2018 to 2022
-- results for individuals over 65 from 2018 to 2022
-- results bootstrapped for under 65
+This folder contains the outputs of the different analyses.
 
-### Results_by gender
+### `Results_all_data`
 
-Contains the results of the analyses stratified by gender:
+Contains analyses from the complete datasets (2018–2022)
 
-- results_men : results for all the men from 2018 to 2022
-- results_bs_men : results for bootstrapped datasets of men from 2018 to 2022
-- results_women : results for all the women from 2018 to 2022
-- results_sampled_women_size_men:results for the women datasets sampled at the size of the men dataset from 2018 to 2022
+### `Results_bs_2018`
 
-### Results_samples_2018_size
+Contains bootstrapped results from the 2018 dataset
 
-Contains the results of the analyses from 2019 to 2022, sampled at the size of 2018
+### `Results_by_age_class`
 
-### Results_samples_regio_prop
+Stratified results by age group:
 
-Contains the results of the analyses from 2019 to 2022, with a number of isolates proportional to the regional populations
+- Individuals under 65 (2018–2022)  
+- Individuals over 65 (2018–2022)  
+- Bootstrapped results for under-65 group
 
+### `Results_by_gender`
+
+Stratified results by gender:
+
+- `results_men` : Men (2018–2022)  
+- `results_bs_men` : Bootstrapped men datasets  
+- `results_women` : Women (2018–2022)  
+- `results_sampled_women_size_men` : Women sampled at the same size as men
+
+### `Results_samples_2018_size`
+
+Analyses of 2019–2022 datasets sampled to match 2018 size
+
+### `Results_samples_regio_prop`
+
+Analyses of 2019–2022 datasets with isolate counts proportional to regional populations
