@@ -19,10 +19,13 @@ This folder includes all scripts required to perform the analyses.
 - `main` : Imports necessary packages, defines parameters, and sequentially runs the scripts  
 - `functions` : Contains all custom functions defined for this study
 
+### Descriptive scripts
+- `Figure1` : Generates Figure 1 (individual antibiotic resistance prevalence)  
+- `Figure2` : Generates Figure 2
+
 ### Analysis Steps
 
 - `1_data_prep` : Preprocessing of the datasets  
-- `2_data_description` : Generates Figure 1 (individual antibiotic resistance prevalence)  
 - `3_simulation_bdd` : Simulates datasets under the hypothesis of mutual independence of resistance traits  
 - `4_apriori` : Applies the Apriori algorithm to both observed and simulated datasets  
 - `5_filtre_itemsets` : Filters Apriori results using `eSup` and `cLift`  
